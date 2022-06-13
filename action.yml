@@ -51,6 +51,9 @@ inputs:
     description: "Enables Docker BuildKit support"
     required: false
     default: "false"
+  useBuildxCommand:
+    description: "Explicitly adds the `buildx` option to the build command"
+    required: false
 outputs:
   imageFullName:
     description: "Full name of the Docker image with registry prefix and tag suffix"

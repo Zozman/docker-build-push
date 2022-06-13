@@ -8322,7 +8322,8 @@ const buildOpts = {
   target: undefined,
   buildDir: undefined,
   enableBuildKit: false,
-  platform: undefined
+  platform: undefined,
+  useBuildxCommand: false
 };
 
 const run = () => {
@@ -8343,6 +8344,7 @@ const run = () => {
     buildOpts.buildDir = core.getInput('directory') || '.';
     buildOpts.enableBuildKit = core.getInput('enableBuildKit') === 'true';
     buildOpts.platform = core.getInput('platform');
+    buildOpts.useBuildxCommand = core.getInput('useBuildxCommand') === 'true';
 
     // Create the Docker image name
     const imageFullName = docker.createFullImageName(registry, image, githubOwner);
@@ -8427,7 +8429,7 @@ const createTags = (addLatest, addTimestamp) => {
 // Dynamically create 'docker build' command based on inputs provided
 const createBuildCommand = (imageName, dockerfile, buildOpts) => {
   const tagsSuffix = buildOpts.tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
-  let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
+  let buildCommandPrefix = `docker${buildOpts.useBuildxCommand ? ' buildx' : ''} build -f ${dockerfile} ${tagsSuffix}`;
 
   if (buildOpts.buildArgs) {
     const argsSuffix = buildOpts.buildArgs.map(arg => `--build-arg ${arg}`).join(' ');

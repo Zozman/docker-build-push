@@ -24,7 +24,7 @@ const mockRepoName = 'some-repo';
 
 const runAssertions = (imageFullName, inputs, tagOverrides) => {
   // Inputs
-  expect(core.getInput).toHaveBeenCalledTimes(15);
+  expect(core.getInput).toHaveBeenCalledTimes(16);
 
   // Outputs
   const tags = tagOverrides || parseArray(inputs.tags);
@@ -62,7 +62,8 @@ beforeEach(() => {
     dockerfile: 'Dockerfile',
     buildDir: '.',
     enableBuildKit: undefined,
-    platform: undefined
+    platform: undefined,
+    useBuildxCommand: undefined
   };
   imageFullName = undefined;
 });
@@ -184,6 +185,7 @@ describe('Create & push Docker image to GCR', () => {
     inputs.buildArgs = 'VERSION=1.1.1,BUILD_DATE=2020-01-14';
     inputs.dockerfile = 'Dockerfile.custom';
     inputs.labels = 'version=1.0,maintainer=mr-smithers-excellent';
+    inputs.useBuildxCommand = 'true';
     imageFullName = getDefaultImageName();
 
     docker.createTags = jest.fn().mockReturnValueOnce(inputs.tags);
@@ -194,7 +196,7 @@ describe('Create & push Docker image to GCR', () => {
     runAssertions(imageFullName, inputs);
 
     expect(cp.execSync).toHaveBeenCalledWith(
-      `docker build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest --build-arg VERSION=1.1.1 --build-arg BUILD_DATE=2020-01-14 --label version=1.0 --label maintainer=mr-smithers-excellent .`,
+      `docker buildx build -f ${inputs.dockerfile} -t ${inputs.registry}/${inputs.image}:latest --build-arg VERSION=1.1.1 --build-arg BUILD_DATE=2020-01-14 --label version=1.0 --label maintainer=mr-smithers-excellent .`,
       cpOptions
     );
   });

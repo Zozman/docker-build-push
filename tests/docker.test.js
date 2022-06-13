@@ -173,7 +173,8 @@ describe('Docker build, login & push commands', () => {
         target: undefined,
         buildDir: '.',
         enableBuildKit: false,
-        platform: undefined
+        platform: undefined,
+        useBuildxCommand: false
       };
       dockerfile = 'Dockerfile';
     });
@@ -247,6 +248,19 @@ describe('Docker build, login & push commands', () => {
       expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
       expect(cp.execSync).toHaveBeenCalledWith(
         `docker build -f Dockerfile -t ${image}:${buildOpts.tags} ${buildOpts.buildDir}`,
+        cpOptions
+      );
+    });
+
+    test('Build with buildx command', () => {
+      const image = 'gcr.io/some-project/image';
+      buildOpts.tags = ['v1'];
+      buildOpts.useBuildxCommand = 'true';
+
+      docker.build(image, dockerfile, buildOpts);
+      expect(fs.existsSync).toHaveBeenCalledWith('Dockerfile');
+      expect(cp.execSync).toHaveBeenCalledWith(
+        `docker buildx build -f Dockerfile -t ${image}:${buildOpts.tags} .`,
         cpOptions
       );
     });

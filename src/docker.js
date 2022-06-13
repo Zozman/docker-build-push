@@ -55,7 +55,7 @@ const createTags = (addLatest, addTimestamp) => {
 // Dynamically create 'docker build' command based on inputs provided
 const createBuildCommand = (imageName, dockerfile, buildOpts) => {
   const tagsSuffix = buildOpts.tags.map(tag => `-t ${imageName}:${tag}`).join(' ');
-  let buildCommandPrefix = `docker build -f ${dockerfile} ${tagsSuffix}`;
+  let buildCommandPrefix = `docker${buildOpts.useBuildxCommand ? ' buildx' : ''} build -f ${dockerfile} ${tagsSuffix}`;
 
   if (buildOpts.buildArgs) {
     const argsSuffix = buildOpts.buildArgs.map(arg => `--build-arg ${arg}`).join(' ');
